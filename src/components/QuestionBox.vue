@@ -9,23 +9,22 @@
 
     <b-list-group>
         <b-list-group-item 
-        v-for="(answer, index) in answers" 
+        v-for="(answer, index) in shuffledAnswers" 
         :key="index"
-        @click="selectAnswer(index)"
-        :class="[selectedIndex === index ? 'selected' : '']"
+        @click.prevent="selectAnswer(index)"
+        :class="answerClass(index)"
         >
           {{ answer }}
         </b-list-group-item>   
     </b-list-group>
-    
-    <p></p>
     <b-button 
     variant="primary"
     @click="submitAnswer"
+    :disabled="selectedIndex === null || answered"
     >
       Submit
     </b-button>
-    <b-button variant="success" href="#" @click="next">Next</b-button>
+    <b-button variant="success" @click="next">Next</b-button>
   </b-jumbotron>
 </div>
 </template>
@@ -39,10 +38,12 @@ export default {
     next: Function,
     increment: Function
   },
-  data() {
+  data: function() {
     return {
     selectedIndex: null,
-    shuffledAnswers: []
+    shuffledAnswers: [],
+    correctIndex: null,
+    answered: false
     }
   },
   watch: {
@@ -50,6 +51,7 @@ export default {
       immediate: true,
       handler() {
       this.selectedIndex = null
+      this.answered = false
       this.shuffleAnswers()
       }
     }
@@ -65,6 +67,17 @@ export default {
     selectAnswer(index) {
       this.selectedIndex = index
     },
+    answerClass(index) {
+      let answerClass = ''
+        if(!this.answered && this.selectedIndex === index) {
+          answerClass = 'selected'
+        } else if(this.answered && this.correctIndex === index) {
+          answerClass = 'correct'
+        } else if(this.answered && this.selectedIndex === index && this.correctIndex !== index) {
+          answerClass = 'incorrect'
+        }
+        return answerClass
+    },
     shuffleAnswers() {
       let answers = [...this.currentQuestion.incorrect_answers, this.currentQuestion.correct_answer]
       this.shuffledAnswers = _.shuffle(answers)
@@ -77,8 +90,9 @@ export default {
         isCorrect = true
       }
           this.increment(isCorrect)
+          this.answered = true
     }
-  }
+  },
 
 }
 </script>
@@ -95,7 +109,7 @@ export default {
   margin: 0 5px;
 }
 .selected {
-  background-color: blueviolet;
+  background-color: lightblue;
 }
 .correct {
   background-color: lightgreen;

@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <Header 
-    numCorrect="numCorrect"
-    numTotal="numTotal"
+    :numCorrect="numCorrect"
+    :numTotal="numTotal"
     />
     <b-container class="bv-example-row">
   <b-row>
@@ -43,7 +43,7 @@ export default {
       this.index++
     },
     increment(isCorrect) {
-      if(isCorrect === true){
+      if (isCorrect === true){
         this.numCorrect++
       }
       this.numTotal++
